@@ -12,7 +12,11 @@ interface Suggestion {
 	originalCode: string
 }
 
-export default function FileUpload() {
+interface FileUploadProps {
+	analysisType: 'general' | 'refactoring' | 'clean-code'
+}
+
+export default function FileUpload({ analysisType }: FileUploadProps) {
 	const [files, setFiles] = useState<File[]>([])
 	const [isLoading, setIsLoading] = useState<boolean>(false)
 	const router = useRouter()
@@ -35,23 +39,23 @@ export default function FileUpload() {
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		setIsLoading(true)
-
 		const formData = new FormData()
 		files.forEach((file) => {
 			formData.append('codefiles', file)
 		})
-
+		formData.append('analysisType', analysisType)
+		// Fetch custom rules from localStorage
+		const customRules = JSON.parse(localStorage.getItem('customRules') || '[]')
+		formData.append('customRules', JSON.stringify(customRules))
 		try {
 			const response = await fetch('/api/upload', {
 				method: 'POST',
 				body: formData,
 			})
-
 			if (response.ok) {
 				const reader = response.body?.getReader()
 				const decoder = new TextDecoder()
 				const suggestions: Suggestion[] = []
-
 				while (reader) {
 					const { done, value } = await reader.read()
 					if (done) break
@@ -64,7 +68,6 @@ export default function FileUpload() {
 						}
 					})
 				}
-
 				localStorage.setItem('suggestions', JSON.stringify(suggestions))
 				router.push('/suggestions')
 			} else {

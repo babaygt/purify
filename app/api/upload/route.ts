@@ -6,9 +6,11 @@ import { join } from 'path'
 export async function POST(request: NextRequest) {
 	const formData = await request.formData()
 	const files = formData.getAll('codefiles') as File[]
-
+	const analysisType = formData.get('analysisType') as string
+	const customRules = JSON.parse(
+		(formData.get('customRules') as string) || '[]'
+	)
 	const uploadDir = join(process.cwd(), 'uploads')
-
 	// Create the uploads directory if it doesn't exist
 	try {
 		await mkdir(uploadDir, { recursive: true })
@@ -19,21 +21,22 @@ export async function POST(request: NextRequest) {
 			{ status: 500 }
 		)
 	}
-
 	const encoder = new TextEncoder()
 	const stream = new TransformStream()
 	const writer = stream.writable.getWriter()
-
 	const processFile = async (file: File) => {
 		try {
 			const bytes = await file.arrayBuffer()
 			const buffer = Buffer.from(bytes)
 			const filePath = join(uploadDir, file.name)
 			await writeFile(filePath, buffer)
-
 			const code = buffer.toString('utf-8')
-			const refactorSuggestion = await analyzeCodeWithOpenAI(code, file.name)
-
+			const refactorSuggestion = await analyzeCodeWithOpenAI(
+				code,
+				file.name,
+				analysisType,
+				customRules
+			)
 			const suggestion = {
 				file: file.name,
 				suggestions: refactorSuggestion,
@@ -54,7 +57,6 @@ export async function POST(request: NextRequest) {
 			)
 		}
 	}
-
 	;(async () => {
 		try {
 			for (const file of files) {
@@ -66,7 +68,6 @@ export async function POST(request: NextRequest) {
 			await writer.close()
 		}
 	})()
-
 	return new NextResponse(stream.readable, {
 		headers: {
 			'Content-Type': 'text/event-stream',

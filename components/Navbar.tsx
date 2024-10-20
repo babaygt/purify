@@ -18,6 +18,9 @@ export default function Navbar() {
 						<Link href='/suggestions'>
 							<Button variant='ghost'>Suggestions</Button>
 						</Link>
+						<Link href='/custom-rules'>
+							<Button variant='ghost'>Custom Rules</Button>
+						</Link>
 						<a
 							href='https://github.com/babaygt/purify'
 							target='_blank'
