@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, ReactNode } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import ReactMarkdown from 'react-markdown'
+import ReactMarkdown, { Components } from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Button } from '@/components/ui/button'
@@ -12,7 +12,7 @@ import { Copy } from 'lucide-react'
 interface CodeBlockProps {
 	inline?: boolean
 	className?: string
-	children: React.ReactNode
+	children?: ReactNode
 }
 
 const CodeBlock: React.FC<CodeBlockProps> = ({
@@ -22,6 +22,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
 	...props
 }) => {
 	const match = /language-(\w+)/.exec(className || '')
+
 	return !inline && match ? (
 		<SyntaxHighlighter
 			style={tomorrow}
@@ -62,20 +63,14 @@ export default function SuggestionDisplay() {
 		return <div>No suggestions available. Please upload files first.</div>
 	}
 
-	const customRenderers = {
-		p: ({ children }: { children: React.ReactNode }) => (
-			<p className='mb-4'>{children}</p>
-		),
+	const customComponents: Components = {
+		p: ({ children }) => <p className='mb-4'>{children}</p>,
 		code: CodeBlock,
-		ol: ({ children }: { children: React.ReactNode }) => (
+		ol: ({ children }) => (
 			<ol className='list-decimal pl-6 mb-4'>{children}</ol>
 		),
-		ul: ({ children }: { children: React.ReactNode }) => (
-			<ul className='list-disc pl-6 mb-4'>{children}</ul>
-		),
-		li: ({ children }: { children: React.ReactNode }) => (
-			<li className='mb-2'>{children}</li>
-		),
+		ul: ({ children }) => <ul className='list-disc pl-6 mb-4'>{children}</ul>,
+		li: ({ children }) => <li className='mb-2'>{children}</li>,
 	}
 
 	return (
@@ -124,7 +119,7 @@ export default function SuggestionDisplay() {
 							</div>
 							<ScrollArea className='h-[600px] w-full rounded-md border p-4 bg-muted'>
 								<div className='prose prose-sm max-w-none dark:prose-invert'>
-									<ReactMarkdown components={customRenderers}>
+									<ReactMarkdown components={customComponents}>
 										{suggestion.suggestions}
 									</ReactMarkdown>
 								</div>
