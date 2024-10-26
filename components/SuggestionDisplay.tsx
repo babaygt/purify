@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, ReactNode } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import ReactMarkdown, { Components } from 'react-markdown'
@@ -12,7 +12,7 @@ import { Copy } from 'lucide-react'
 interface CodeBlockProps {
 	inline?: boolean
 	className?: string
-	children?: ReactNode
+	children?: string
 }
 
 const CodeBlock: React.FC<CodeBlockProps> = ({
@@ -65,7 +65,7 @@ export default function SuggestionDisplay() {
 
 	const customComponents: Components = {
 		p: ({ children }) => <p className='mb-4'>{children}</p>,
-		code: CodeBlock,
+		code: CodeBlock as Components['code'],
 		ol: ({ children }) => (
 			<ol className='list-decimal pl-6 mb-4'>{children}</ol>
 		),
