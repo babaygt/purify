@@ -2,12 +2,10 @@
 
 import React, { useState, useEffect } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import ReactMarkdown, { Components } from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import { Button } from '@/components/ui/button'
-import { Copy } from 'lucide-react'
+import { CodeSection } from '@/components/suggestion/CodeSection'
 
 interface CodeBlockProps {
 	inline?: boolean
@@ -45,10 +43,6 @@ interface Suggestion {
 	originalCode: string
 }
 
-const copyToClipboard = (text: string) => {
-	navigator.clipboard.writeText(text)
-}
-
 export default function SuggestionDisplay() {
 	const [suggestions, setSuggestions] = useState<Suggestion[]>([])
 
@@ -81,50 +75,21 @@ export default function SuggestionDisplay() {
 						<CardTitle className='text-center'>{suggestion.file}</CardTitle>
 					</CardHeader>
 					<CardContent className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
-						<div>
-							<div className='flex justify-between items-center mb-2'>
-								<h4 className='font-semibold'>Original Code</h4>
-								<Button
-									variant='outline'
-									size='sm'
-									onClick={() => copyToClipboard(suggestion.originalCode)}
-								>
-									<Copy className='mr-2 h-4 w-4' />
-									Copy
-								</Button>
+						<CodeSection
+							title='Original Code'
+							content={suggestion.originalCode}
+						/>
+						<CodeSection
+							title='Suggestions'
+							content={suggestion.suggestions}
+							isMarkdown={true}
+						>
+							<div className='prose prose-sm max-w-none dark:prose-invert'>
+								<ReactMarkdown components={customComponents}>
+									{suggestion.suggestions}
+								</ReactMarkdown>
 							</div>
-							<ScrollArea className='h-[600px] w-full rounded-md border p-4 bg-muted'>
-								<SyntaxHighlighter
-									language='javascript'
-									style={tomorrow}
-									wrapLines={true}
-									showLineNumbers={true}
-									className='text-sm'
-								>
-									{suggestion.originalCode}
-								</SyntaxHighlighter>
-							</ScrollArea>
-						</div>
-						<div>
-							<div className='flex justify-between items-center mb-2'>
-								<h4 className='font-semibold'>Suggestions</h4>
-								<Button
-									variant='outline'
-									size='sm'
-									onClick={() => copyToClipboard(suggestion.suggestions)}
-								>
-									<Copy className='mr-2 h-4 w-4' />
-									Copy
-								</Button>
-							</div>
-							<ScrollArea className='h-[600px] w-full rounded-md border p-4 bg-muted'>
-								<div className='prose prose-sm max-w-none dark:prose-invert'>
-									<ReactMarkdown components={customComponents}>
-										{suggestion.suggestions}
-									</ReactMarkdown>
-								</div>
-							</ScrollArea>
-						</div>
+						</CodeSection>
 					</CardContent>
 				</Card>
 			))}
