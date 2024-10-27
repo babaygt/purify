@@ -4,7 +4,7 @@ import { useState, ChangeEvent, FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
-import { Upload, FileText } from 'lucide-react'
+import { Upload } from 'lucide-react'
 import { LoadingState } from '@/components/state/loading-state'
 import { ErrorState } from '@/components/state/error-state'
 import {
@@ -12,6 +12,7 @@ import {
 	processStreamResponse,
 	uploadFiles,
 } from '@/utils/fileHandlers'
+import { FileList } from '@/components/FileList'
 
 interface FileUploadProps {
 	analysisType: 'general' | 'refactoring' | 'clean-code'
@@ -92,20 +93,7 @@ export default function FileUpload({ analysisType }: FileUploadProps) {
 					/>
 				</label>
 			</div>
-			{files.length > 0 && (
-				<div className='bg-muted rounded-lg p-4'>
-					<h3 className='text-lg font-semibold mb-2 flex items-center text-foreground'>
-						<FileText className='mr-2' /> Selected Files
-					</h3>
-					<ul className='list-disc list-inside'>
-						{files.map((file, index) => (
-							<li key={index} className='text-sm text-muted-foreground'>
-								{file.name}
-							</li>
-						))}
-					</ul>
-				</div>
-			)}
+			{files.length > 0 && <FileList files={files} />}
 			<Button
 				type='submit'
 				disabled={isLoading || files.length === 0}
