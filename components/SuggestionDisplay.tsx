@@ -1,25 +1,12 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { CodeSection } from '@/components/suggestion/CodeSection'
 import { MarkdownRenderer } from '@/components/suggestion/MarkdownRenderer'
-
-interface Suggestion {
-	file: string
-	suggestions: string
-	originalCode: string
-}
+import { useSuggestions } from '@/hooks/useSuggestions'
 
 export default function SuggestionDisplay() {
-	const [suggestions, setSuggestions] = useState<Suggestion[]>([])
-
-	useEffect(() => {
-		const storedSuggestions = localStorage.getItem('suggestions')
-		if (storedSuggestions) {
-			setSuggestions(JSON.parse(storedSuggestions))
-		}
-	}, [])
+	const { suggestions } = useSuggestions()
 
 	return (
 		<div className='space-y-8'>
