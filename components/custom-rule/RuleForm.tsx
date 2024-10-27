@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label'
 import { CustomRule } from '@/types'
 
 interface RuleFormProps {
-	newRule: CustomRule
+	newRule: Omit<CustomRule, 'id'>
 	onSubmit: (e: React.FormEvent) => void
 	onChange: (
 		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

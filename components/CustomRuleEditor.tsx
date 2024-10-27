@@ -1,9 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { RuleForm } from '@/components/custom-rule/RuleForm'
-
 import { Plus } from 'lucide-react'
 import {
 	Dialog,
@@ -13,19 +12,13 @@ import {
 } from '@/components/ui/dialog'
 import { RuleCard } from '@/components/custom-rule/RuleCard'
 import { SearchBar } from '@/components/custom-rule/SearchBar'
-
-interface CustomRule {
-	id: string
-	name: string
-	description: string
-	pattern: string
-	suggestion: string
-}
+import { useCustomRules } from '@/hooks/useCustomRules'
+import { LoadingState } from '@/components/state/loading-state'
+import { CustomRule } from '@/types'
 
 export default function CustomRuleEditor() {
-	const [rules, setRules] = useState<CustomRule[]>([])
-	const [newRule, setNewRule] = useState<CustomRule>({
-		id: '',
+	const { rules, isLoading, addRule, deleteRule } = useCustomRules()
+	const [newRule, setNewRule] = useState<Omit<CustomRule, 'id'>>({
 		name: '',
 		description: '',
 		pattern: '',
@@ -33,13 +26,6 @@ export default function CustomRuleEditor() {
 	})
 	const [searchTerm, setSearchTerm] = useState('')
 	const [isModalOpen, setIsModalOpen] = useState(false)
-
-	useEffect(() => {
-		const storedRules = localStorage.getItem('customRules')
-		if (storedRules) {
-			setRules(JSON.parse(storedRules))
-		}
-	}, [])
 
 	const handleInputChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -49,11 +35,8 @@ export default function CustomRuleEditor() {
 
 	const handleAddRule = (e: React.FormEvent) => {
 		e.preventDefault()
-		const updatedRules = [...rules, { ...newRule, id: Date.now().toString() }]
-		setRules(updatedRules)
-		localStorage.setItem('customRules', JSON.stringify(updatedRules))
+		addRule(newRule)
 		setNewRule({
-			id: '',
 			name: '',
 			description: '',
 			pattern: '',
@@ -62,15 +45,13 @@ export default function CustomRuleEditor() {
 		setIsModalOpen(false)
 	}
 
-	const handleDeleteRule = (id: string) => {
-		const updatedRules = rules.filter((rule) => rule.id !== id)
-		setRules(updatedRules)
-		localStorage.setItem('customRules', JSON.stringify(updatedRules))
-	}
-
 	const filteredRules = rules.filter((rule) =>
 		rule.name.toLowerCase().includes(searchTerm.toLowerCase())
 	)
+
+	if (isLoading) {
+		return <LoadingState />
+	}
 
 	return (
 		<div className='space-y-8 max-w-6xl mx-auto'>
@@ -86,7 +67,7 @@ export default function CustomRuleEditor() {
 
 			<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
 				{filteredRules.map((rule) => (
-					<RuleCard key={rule.id} rule={rule} onDelete={handleDeleteRule} />
+					<RuleCard key={rule.id} rule={rule} onDelete={deleteRule} />
 				))}
 			</div>
 
