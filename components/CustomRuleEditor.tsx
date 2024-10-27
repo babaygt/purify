@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { RuleForm } from '@/components/custom-rule/RuleForm'
 
-import { Search, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import {
 	Dialog,
 	DialogContent,
@@ -13,6 +12,7 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog'
 import { RuleCard } from '@/components/custom-rule/RuleCard'
+import { SearchBar } from '@/components/custom-rule/SearchBar'
 
 interface CustomRule {
 	id: string
@@ -75,15 +75,7 @@ export default function CustomRuleEditor() {
 	return (
 		<div className='space-y-8 max-w-6xl mx-auto'>
 			<div className='flex items-center justify-between space-x-4'>
-				<div className='relative flex-grow'>
-					<Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground' />
-					<Input
-						placeholder='Search rules...'
-						value={searchTerm}
-						onChange={(e) => setSearchTerm(e.target.value)}
-						className='pl-10 w-full'
-					/>
-				</div>
+				<SearchBar value={searchTerm} onChange={setSearchTerm} />
 				<Button
 					onClick={() => setIsModalOpen(true)}
 					className='bg-green-500 hover:bg-green-600'
