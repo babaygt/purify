@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
 import { Upload, FileText } from 'lucide-react'
+import { LoadingState } from '@/components/state/loading-state'
+import { ErrorState } from '@/components/state/error-state'
 
 interface Suggestion {
 	file: string
@@ -19,6 +21,7 @@ interface FileUploadProps {
 export default function FileUpload({ analysisType }: FileUploadProps) {
 	const [files, setFiles] = useState<File[]>([])
 	const [isLoading, setIsLoading] = useState<boolean>(false)
+	const [error, setError] = useState<string | null>(null)
 	const router = useRouter()
 
 	const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -39,6 +42,7 @@ export default function FileUpload({ analysisType }: FileUploadProps) {
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		setIsLoading(true)
+		setError(null)
 		const formData = new FormData()
 		files.forEach((file) => {
 			formData.append('codefiles', file)
@@ -74,10 +78,26 @@ export default function FileUpload({ analysisType }: FileUploadProps) {
 				console.error('Error uploading files')
 			}
 		} catch (error) {
+			setError('Error uploading files. Please try again.')
 			console.error('Error:', error)
 		} finally {
 			setIsLoading(false)
 		}
+	}
+
+	if (isLoading) {
+		return <LoadingState size={8} className='h-32' />
+	}
+
+	if (error) {
+		return (
+			<ErrorState
+				message={error}
+				actionText='Try Again'
+				actionHref='#'
+				onClick={() => setError(null)}
+			/>
+		)
 	}
 
 	return (

@@ -1,11 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import SuggestionDisplay from '@/components/SuggestionDisplay'
-import { Button } from '@/components/ui/button'
-import { Loader2 } from 'lucide-react'
 import { PageContainer } from '@/components/layout/PageContainer'
+import { LoadingState } from '@/components/state/loading-state'
+import { ErrorState } from '@/components/state/error-state'
 
 export default function SuggestionsPage() {
 	const [loading, setLoading] = useState(true)
@@ -24,16 +23,9 @@ export default function SuggestionsPage() {
 	return (
 		<PageContainer title='Refactoring Suggestions'>
 			{loading ? (
-				<div className='flex justify-center items-center h-64'>
-					<Loader2 className='mr-2 h-16 w-16 animate-spin' />
-				</div>
+				<LoadingState />
 			) : error ? (
-				<div className='text-center'>
-					<p className='text-destructive mb-4'>{error}</p>
-					<Link href='/analyze'>
-						<Button>Start New Analysis</Button>
-					</Link>
-				</div>
+				<ErrorState message={error} />
 			) : (
 				<SuggestionDisplay />
 			)}
