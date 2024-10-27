@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+import { RuleForm } from '@/components/custom-rule/RuleForm'
 import {
 	Card,
 	CardHeader,
@@ -23,7 +23,6 @@ import {
 	AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Search, Plus, Trash2, FileCode } from 'lucide-react'
-import { Label } from '@/components/ui/label'
 import {
 	Dialog,
 	DialogContent,
@@ -167,54 +166,11 @@ export default function CustomRuleEditor() {
 					<DialogHeader>
 						<DialogTitle>Add New Rule</DialogTitle>
 					</DialogHeader>
-					<form onSubmit={handleAddRule} className='space-y-4'>
-						<div>
-							<Label htmlFor='name'>Rule Name</Label>
-							<Input
-								id='name'
-								name='name'
-								placeholder='Enter rule name'
-								value={newRule.name}
-								onChange={handleInputChange}
-							/>
-						</div>
-						<div>
-							<Label htmlFor='description'>Rule Description</Label>
-							<Textarea
-								id='description'
-								name='description'
-								placeholder='Describe the rule'
-								value={newRule.description}
-								onChange={handleInputChange}
-							/>
-						</div>
-						<div>
-							<Label htmlFor='pattern'>Pattern (regex)</Label>
-							<Input
-								id='pattern'
-								name='pattern'
-								placeholder='Enter regex pattern'
-								value={newRule.pattern}
-								onChange={handleInputChange}
-							/>
-						</div>
-						<div>
-							<Label htmlFor='suggestion'>Suggestion</Label>
-							<Textarea
-								id='suggestion'
-								name='suggestion'
-								placeholder='Provide a suggestion for improvement'
-								value={newRule.suggestion}
-								onChange={handleInputChange}
-							/>
-						</div>
-						<Button
-							type='submit'
-							className='w-full bg-green-500 hover:bg-green-600'
-						>
-							Add Rule
-						</Button>
-					</form>
+					<RuleForm
+						newRule={newRule}
+						onSubmit={handleAddRule}
+						onChange={handleInputChange}
+					/>
 				</DialogContent>
 			</Dialog>
 
