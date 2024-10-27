@@ -1,6 +1,6 @@
-import FileUpload from '@/components/FileUpload'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PageContainer } from '@/components/layout/PageContainer'
+import { AnalysisTab } from '@/components/analyze/AnalysisTab'
 
 export default function AnalyzePage() {
 	return (
@@ -12,19 +12,13 @@ export default function AnalyzePage() {
 					<TabsTrigger value='clean-code'>Clean Code (R. Martin)</TabsTrigger>
 				</TabsList>
 				<TabsContent value='general'>
-					<div className='bg-card text-card-foreground rounded-lg shadow-md p-6'>
-						<FileUpload analysisType='general' />
-					</div>
+					<AnalysisTab analysisType='general' />
 				</TabsContent>
 				<TabsContent value='refactoring'>
-					<div className='bg-card text-card-foreground rounded-lg shadow-md p-6'>
-						<FileUpload analysisType='refactoring' />
-					</div>
+					<AnalysisTab analysisType='refactoring' />
 				</TabsContent>
 				<TabsContent value='clean-code'>
-					<div className='bg-card text-card-foreground rounded-lg shadow-md p-6'>
-						<FileUpload analysisType='clean-code' />
-					</div>
+					<AnalysisTab analysisType='clean-code' />
 				</TabsContent>
 			</Tabs>
 		</PageContainer>
