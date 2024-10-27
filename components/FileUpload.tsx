@@ -7,12 +7,11 @@ import { useRouter } from 'next/navigation'
 import { Upload, FileText } from 'lucide-react'
 import { LoadingState } from '@/components/state/loading-state'
 import { ErrorState } from '@/components/state/error-state'
-
-interface Suggestion {
-	file: string
-	suggestions: string
-	originalCode: string
-}
+import {
+	filterUploadedFiles,
+	processStreamResponse,
+	uploadFiles,
+} from '@/utils/fileHandlers'
 
 interface FileUploadProps {
 	analysisType: 'general' | 'refactoring' | 'clean-code'
@@ -27,14 +26,7 @@ export default function FileUpload({ analysisType }: FileUploadProps) {
 	const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
 			const selectedFiles = Array.from(e.target.files)
-			const filteredFiles = selectedFiles.filter((file) => {
-				const relativePath = file.webkitRelativePath || file.name
-				return (
-					!relativePath.includes('node_modules') &&
-					!relativePath.startsWith('.') &&
-					!relativePath.endsWith('.log')
-				)
-			})
+			const filteredFiles = filterUploadedFiles(selectedFiles)
 			setFiles(filteredFiles)
 		}
 	}
@@ -43,39 +35,13 @@ export default function FileUpload({ analysisType }: FileUploadProps) {
 		e.preventDefault()
 		setIsLoading(true)
 		setError(null)
-		const formData = new FormData()
-		files.forEach((file) => {
-			formData.append('codefiles', file)
-		})
-		formData.append('analysisType', analysisType)
-		// Fetch custom rules from localStorage
-		const customRules = JSON.parse(localStorage.getItem('customRules') || '[]')
-		formData.append('customRules', JSON.stringify(customRules))
+
 		try {
-			const response = await fetch('/api/upload', {
-				method: 'POST',
-				body: formData,
-			})
-			if (response.ok) {
-				const reader = response.body?.getReader()
-				const decoder = new TextDecoder()
-				const suggestions: Suggestion[] = []
-				while (reader) {
-					const { done, value } = await reader.read()
-					if (done) break
-					const chunk = decoder.decode(value)
-					const lines = chunk.split('\n\n')
-					lines.forEach((line) => {
-						if (line.startsWith('data: ')) {
-							const data = JSON.parse(line.slice(6))
-							suggestions.push(data)
-						}
-					})
-				}
+			const reader = await uploadFiles(files, analysisType)
+			if (reader) {
+				const suggestions = await processStreamResponse(reader)
 				localStorage.setItem('suggestions', JSON.stringify(suggestions))
 				router.push('/suggestions')
-			} else {
-				console.error('Error uploading files')
 			}
 		} catch (error) {
 			setError('Error uploading files. Please try again.')

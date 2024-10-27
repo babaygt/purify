@@ -5,3 +5,9 @@ export interface CustomRule {
 	pattern: string
 	suggestion: string
 }
+
+export interface Suggestion {
+	file: string
+	suggestions: string
+	originalCode: string
+}
