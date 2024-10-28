@@ -19,7 +19,7 @@ export default function Home() {
 							<ArrowRight className='ml-2 group-hover:translate-x-1 transition-transform' />
 						</Button>
 					</Link>
-					<Link href='/about'>
+					<Link href='https://github.com/babaygt/purify'>
 						<Button variant='outline' size='lg'>
 							Learn More
 						</Button>
