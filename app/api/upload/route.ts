@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { analyzeCodeWithOpenAI } from '@/lib/openai'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
 
 export async function POST(request: NextRequest) {
 	const formData = await request.formData()
@@ -10,38 +8,27 @@ export async function POST(request: NextRequest) {
 	const customRules = JSON.parse(
 		(formData.get('customRules') as string) || '[]'
 	)
-	const uploadDir = join(process.cwd(), 'uploads')
-	// Create the uploads directory if it doesn't exist
-	try {
-		await mkdir(uploadDir, { recursive: true })
-	} catch (error) {
-		console.error('Error creating uploads directory:', error)
-		return NextResponse.json(
-			{ error: 'Failed to create uploads directory' },
-			{ status: 500 }
-		)
-	}
+
 	const encoder = new TextEncoder()
 	const stream = new TransformStream()
 	const writer = stream.writable.getWriter()
+
 	const processFile = async (file: File) => {
 		try {
-			const bytes = await file.arrayBuffer()
-			const buffer = Buffer.from(bytes)
-			const filePath = join(uploadDir, file.name)
-			await writeFile(filePath, buffer)
-			const code = buffer.toString('utf-8')
+			const code = await file.text() // Read file content directly without saving
 			const refactorSuggestion = await analyzeCodeWithOpenAI(
 				code,
 				file.name,
 				analysisType,
 				customRules
 			)
+
 			const suggestion = {
 				file: file.name,
 				suggestions: refactorSuggestion,
 				originalCode: code,
 			}
+
 			await writer.write(
 				encoder.encode(`data: ${JSON.stringify(suggestion)}\n\n`)
 			)
@@ -57,6 +44,7 @@ export async function POST(request: NextRequest) {
 			)
 		}
 	}
+
 	;(async () => {
 		try {
 			for (const file of files) {
@@ -68,6 +56,7 @@ export async function POST(request: NextRequest) {
 			await writer.close()
 		}
 	})()
+
 	return new NextResponse(stream.readable, {
 		headers: {
 			'Content-Type': 'text/event-stream',
