@@ -13,6 +13,13 @@ export async function POST(request: NextRequest) {
 	const stream = new TransformStream()
 	const writer = stream.writable.getWriter()
 
+	// Process files in chunks of 3
+	const chunkSize = 3
+	const processChunk = async (startIndex: number) => {
+		const chunk = files.slice(startIndex, startIndex + chunkSize)
+		await Promise.all(chunk.map((file) => processFile(file)))
+	}
+
 	const processFile = async (file: File) => {
 		try {
 			const code = await file.text() // Read file content directly without saving
@@ -47,8 +54,8 @@ export async function POST(request: NextRequest) {
 
 	;(async () => {
 		try {
-			for (const file of files) {
-				await processFile(file)
+			for (let i = 0; i < files.length; i += chunkSize) {
+				await processChunk(i)
 			}
 		} catch (error) {
 			console.error('Error processing files:', error)
