@@ -18,7 +18,11 @@ export function useSuggestions() {
 				setSuggestions(JSON.parse(storedSuggestions))
 				setLoading(false)
 			} catch (e) {
-				setError('Invalid suggestions data')
+				setError(
+					`Invalid suggestions data: ${
+						e instanceof Error ? e.message : 'Unknown error'
+					}`
+				)
 				setLoading(false)
 			}
 		} else {
